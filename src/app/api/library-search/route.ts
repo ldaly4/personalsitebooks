@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { books } from "@/data/books";
 
+export const dynamic = "force-static";
+
 function simpleSearch(query: string) {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
   return books

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getFootballProvider } from "@/lib/providers";
 
+export const dynamic = "force-static";
 export const revalidate = 15;
 
 export async function GET() {
