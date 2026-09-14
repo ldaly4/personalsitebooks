@@ -248,13 +248,16 @@ textarea {
 
 .book-hit {
   position: relative;
+  display: block;
   width: var(--spine-w);
   height: var(--book-h);
   flex: 0 0 var(--spine-w);
   border: 0;
   padding: 0;
   background: transparent;
+  color: inherit;
   cursor: pointer;
+  text-decoration: none;
   transform-style: preserve-3d;
   z-index: 1;
 }

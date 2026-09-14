@@ -12,7 +12,7 @@ type BookSpineProps = {
 };
 
 export function BookSpine({ book, onOpen, active = false }: BookSpineProps) {
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
   const [hovered, setHovered] = useState(false);
   const [card, setCard] = useState<{ left: number; top: number } | null>(null);
   const leaveTimer = useRef<number | null>(null);
@@ -25,7 +25,7 @@ export function BookSpine({ book, onOpen, active = false }: BookSpineProps) {
 
   function showCard() {
     if (leaveTimer.current) window.clearTimeout(leaveTimer.current);
-    const rect = buttonRef.current?.getBoundingClientRect();
+    const rect = linkRef.current?.getBoundingClientRect();
     if (!rect) return;
     setHovered(true);
     setCard({ left: rect.left + rect.width / 2, top: rect.top - 14 });
@@ -39,7 +39,7 @@ export function BookSpine({ book, onOpen, active = false }: BookSpineProps) {
   }
 
   function openBook() {
-    const rect = buttonRef.current?.getBoundingClientRect();
+    const rect = linkRef.current?.getBoundingClientRect();
     if (rect) onOpen(rect);
   }
 
@@ -58,13 +58,17 @@ export function BookSpine({ book, onOpen, active = false }: BookSpineProps) {
 
   return (
     <>
-      <button
-        ref={buttonRef}
+      <a
+        ref={linkRef}
         className="book-hit"
+        href={`#${book.id}`}
         style={style}
-        type="button"
         aria-label={`Open ${book.title}`}
-        onClick={openBook}
+        onClick={(event) => {
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          openBook();
+        }}
         onFocus={showCard}
         onBlur={hideCard}
         onMouseEnter={showCard}
@@ -94,7 +98,7 @@ export function BookSpine({ book, onOpen, active = false }: BookSpineProps) {
           <span className="page-block" />
           {book.binding === "hardcover" && <span className="headband" />}
         </span>
-      </button>
+      </a>
 
       {hovered &&
         card &&

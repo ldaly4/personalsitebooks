@@ -79,6 +79,7 @@ export function Shelf({ books, selectedId, onSelect }: ShelfProps) {
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     if (!railRef.current) return;
+    if ((event.target as HTMLElement).closest(".book-hit")) return;
     dragging.current = { x: event.clientX, left: railRef.current.scrollLeft };
     railRef.current.setPointerCapture(event.pointerId);
   }
