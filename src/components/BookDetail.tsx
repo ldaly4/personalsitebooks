@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { COVER_W } from "@/components/bookFaces";
-import type { Book } from "@/data/books";
+import type { SiteSection } from "@/data/sections";
 
 type BookDetailProps = {
-  book: Book;
+  book: SiteSection;
   rect: DOMRect;
   onClose: () => void;
   onPrev: () => void;
@@ -64,41 +64,59 @@ export function BookDetail({ book, rect, onClose, onPrev, onNext }: BookDetailPr
           height: rect.height,
           transform,
           "--spine": book.spine,
+          "--band": book.band ?? book.spine,
           "--ink": book.ink,
         } as React.CSSProperties}
       >
         <div className="detail-cover" style={{ width: COVER_W }}>
-          {book.cover ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={book.cover} alt={`${book.title} cover`} />
-          ) : (
-            <div className="fallback-cover">
-              <strong>{book.title}</strong>
-              <small>{book.author}</small>
-            </div>
-          )}
+          <div className="typeset-cover detail-typeset-cover">
+            <span className="cover-rule" />
+            <strong>{book.title}</strong>
+            <small>{book.coverNote}</small>
+            <span className="cover-foil">{book.publisher}</span>
+          </div>
         </div>
       </div>
-      <aside className="detail-panel">
-        <p className="mono-label">{book.recommender ? `Recommended by ${book.recommender}` : book.finished ? `Finished ${book.finished}` : "Selected volume"}</p>
+      <article className="detail-panel" tabIndex={-1}>
+        <p className="mono-label">{book.coverNote}</p>
         <h2>{book.title}</h2>
-        <p className="detail-author">{book.author}</p>
-        <p className="detail-blurb">{book.blurb || "No blurb is available yet."}</p>
-        <div className="detail-facts">
-          <span>{book.year || "Unknown year"}</span>
-          <span>{book.publisher || "Unknown publisher"}</span>
-          <span>{book.rating ? `${book.rating}/5 stars` : "Unrated"}</span>
+        <p className="detail-author">{book.description}</p>
+        <div className="section-scroll">
+          <p className="detail-blurb">{book.contentIntro}</p>
+          {book.blocks.map((block) => (
+            <section className="section-block" key={block.heading}>
+              {block.imageLabel && <div className="section-image-placeholder">{block.imageLabel}</div>}
+              <h3>{block.heading}</h3>
+              <p>{block.body}</p>
+              {block.items?.length ? (
+                <ul>
+                  {block.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              ) : null}
+              {block.links?.length ? (
+                <div className="section-links">
+                  {block.links.map((link) => (
+                    <a href={link.href} key={link.label}>
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              ) : null}
+            </section>
+          ))}
         </div>
         <div className="detail-controls">
           <button type="button" onClick={onPrev} aria-label="Previous book">
             {"<"}
           </button>
-          <button type="button" onClick={retract}>Shelve it</button>
+          <button type="button" onClick={retract}>Back to shelf</button>
           <button type="button" onClick={onNext} aria-label="Next book">
             {">"}
           </button>
         </div>
-      </aside>
+      </article>
     </div>
   );
 }

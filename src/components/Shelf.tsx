@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BookDetail } from "@/components/BookDetail";
 import { BookSpine } from "@/components/BookSpine";
-import type { Book } from "@/data/books";
+import type { SiteSection } from "@/data/sections";
 
 type ShelfProps = {
-  books: Book[];
-  justAdded?: string | null;
-  genres?: string[];
+  books: SiteSection[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
 };
 
 type OpenBook = {
@@ -16,17 +16,16 @@ type OpenBook = {
   rect: DOMRect;
 };
 
-function shelfWidth(books: Book[]) {
+function shelfWidth(books: SiteSection[]) {
   return books.reduce((sum, book) => sum + book.width + 2, 0);
 }
 
-export function Shelf({ books, justAdded }: ShelfProps) {
+export function Shelf({ books, selectedId, onSelect }: ShelfProps) {
   const railRef = useRef<HTMLDivElement>(null);
   const dragging = useRef<{ x: number; left: number } | null>(null);
   const [open, setOpen] = useState<OpenBook | null>(null);
   const [overflowing, setOverflowing] = useState(false);
-  const copies = shelfWidth(books) > 2600 ? 3 : 1;
-  const renderedBooks = useMemo(() => Array.from({ length: copies }, () => books).flat(), [books, copies]);
+  const renderedBooks = useMemo(() => books, [books]);
 
   useEffect(() => {
     const rail = railRef.current;
@@ -35,7 +34,6 @@ export function Shelf({ books, justAdded }: ShelfProps) {
     function measure() {
       if (!rail) return;
       setOverflowing(rail.scrollWidth > rail.clientWidth + 6);
-      if (copies === 3 && rail.scrollLeft < 10) rail.scrollLeft = rail.scrollWidth / 3;
       updatePerspective();
     }
 
@@ -48,12 +46,6 @@ export function Shelf({ books, justAdded }: ShelfProps) {
         const eased = Math.sign(distance) * Math.pow(Math.min(Math.abs(distance), 1), 1.35);
         node.style.setProperty("--ry", `${eased * -34}deg`);
       });
-
-      if (copies === 3) {
-        const segment = rail.scrollWidth / 3;
-        if (rail.scrollLeft < segment * 0.45) rail.scrollLeft += segment;
-        if (rail.scrollLeft > segment * 1.55) rail.scrollLeft -= segment;
-      }
     }
 
     const observer = new ResizeObserver(measure);
@@ -64,13 +56,20 @@ export function Shelf({ books, justAdded }: ShelfProps) {
       observer.disconnect();
       rail.removeEventListener("scroll", updatePerspective);
     };
-  }, [books, copies]);
+  }, [books]);
 
   useEffect(() => {
-    if (!justAdded) return;
-    const node = railRef.current?.querySelector<HTMLElement>(`[data-book-id="${CSS.escape(justAdded)}"]`);
-    node?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-  }, [justAdded]);
+    if (!selectedId) {
+      setOpen(null);
+      return;
+    }
+
+    const node = railRef.current?.querySelector<HTMLElement>(`[data-book-id="${CSS.escape(selectedId)}"] .book-hit`);
+    const index = books.findIndex((book) => book.id === selectedId);
+    if (!node || index < 0) return;
+    node.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    window.setTimeout(() => setOpen({ index, rect: node.getBoundingClientRect() }), 120);
+  }, [books, selectedId]);
 
   function onWheel(event: React.WheelEvent<HTMLDivElement>) {
     if (!railRef.current || Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
@@ -102,13 +101,13 @@ export function Shelf({ books, justAdded }: ShelfProps) {
 
   function openAt(renderedIndex: number, rect: DOMRect) {
     setOpen({ index: renderedIndex % books.length, rect });
+    onSelect(books[renderedIndex % books.length].id);
   }
 
   function move(delta: number) {
-    setOpen((current) => {
-      if (!current) return current;
-      return { ...current, index: (current.index + delta + books.length) % books.length };
-    });
+    if (!open) return;
+    const index = (open.index + delta + books.length) % books.length;
+    onSelect(books[index].id);
   }
 
   return (
@@ -134,7 +133,6 @@ export function Shelf({ books, justAdded }: ShelfProps) {
               <BookSpine
                 book={book}
                 active={open?.index === index % books.length}
-                shelveIn={book.id === justAdded}
                 onOpen={(rect) => openAt(index, rect)}
               />
             </span>
@@ -144,7 +142,7 @@ export function Shelf({ books, justAdded }: ShelfProps) {
       <div className="shelf-line" aria-hidden="true" />
       <div className="shelf-shadow" aria-hidden="true" />
       {open && books[open.index] && (
-        <BookDetail book={books[open.index]} rect={open.rect} onClose={() => setOpen(null)} onPrev={() => move(-1)} onNext={() => move(1)} />
+        <BookDetail book={books[open.index]} rect={open.rect} onClose={() => onSelect(null)} onPrev={() => move(-1)} onNext={() => move(1)} />
       )}
     </section>
   );

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const FULL = "Welcome to my library";
+const FULL = "Welcome to my little library";
 
 export function TypedTitle() {
   const [count, setCount] = useState(0);

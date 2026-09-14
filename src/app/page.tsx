@@ -1,29 +1,43 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { LibraryFilter } from "@/components/LibraryFilter";
-import { RecommendBookDialog } from "@/components/RecommendBookDialog";
+import { useEffect, useState } from "react";
 import { Shelf } from "@/components/Shelf";
 import { TypedTitle } from "@/components/TypedTitle";
-import { books, type Book } from "@/data/books";
+import { sections } from "@/data/sections";
+
+function currentSectionFromHash() {
+  if (typeof window === "undefined") return null;
+  const id = window.location.hash.replace(/^#/, "");
+  return sections.some((section) => section.id === id) ? id : null;
+}
 
 export default function Home() {
-  const [shown, setShown] = useState<Book[] | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [recommendations, setRecommendations] = useState<Book[]>([]);
-  const [justAdded, setJustAdded] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const visibleBooks = shown ?? books;
-  const filteredCount = visibleBooks.length;
-  const recommendationGenres = useMemo(
-    () => Array.from(new Set(recommendations.flatMap((book) => book.genres ?? []))),
-    [recommendations],
-  );
+  useEffect(() => {
+    setSelectedId(currentSectionFromHash());
 
-  function addRecommendation(book: Book) {
-    setRecommendations((current) => [book, ...current]);
-    setJustAdded(book.id);
-    window.setTimeout(() => setJustAdded(null), 1400);
+    function onHashChange() {
+      setSelectedId(currentSectionFromHash());
+    }
+
+    window.addEventListener("hashchange", onHashChange);
+    window.addEventListener("popstate", onHashChange);
+    return () => {
+      window.removeEventListener("hashchange", onHashChange);
+      window.removeEventListener("popstate", onHashChange);
+    };
+  }, []);
+
+  function selectSection(id: string | null) {
+    if (id) {
+      if (window.location.hash !== `#${id}`) window.history.pushState(null, "", `#${id}`);
+      setSelectedId(id);
+      return;
+    }
+
+    if (window.location.hash) window.history.pushState(null, "", window.location.pathname);
+    setSelectedId(null);
   }
 
   return (
@@ -37,52 +51,15 @@ export default function Home() {
           <div className="title-row">
             <TypedTitle />
             <div className="volume-count">
-              <span>{filteredCount}</span>
-              <small>{filteredCount === 1 ? "volume" : "volumes"}</small>
+              <span>{sections.length}</span>
+              <small>sections</small>
             </div>
           </div>
-
-          <div className="library-actions">
-            <LibraryFilter books={books} onChange={setShown} />
-            <button className="recommend-trigger" type="button" onClick={() => setDialogOpen(true)}>
-              <span aria-hidden="true">+</span>
-              Recommend a book
-            </button>
-          </div>
+          <p className="library-instruction">Choose a book to explore.</p>
         </header>
 
-        {visibleBooks.length > 0 ? (
-          <Shelf books={visibleBooks} />
-        ) : (
-          <section className="empty-shelf" aria-label="Empty shelf">
-            <div className="empty-rail" aria-hidden="true">
-              {Array.from({ length: 18 }).map((_, index) => (
-                <span key={index} style={{ "--h": `${52 + (index % 5) * 8}px` } as React.CSSProperties} />
-              ))}
-            </div>
-            <div>
-              <p className="mono-label">Shelf waiting</p>
-              <h2>Your Goodreads export is needed to place the real books.</h2>
-              <p>
-                Add <code>goodreads_library_export.csv</code> to the project and I can regenerate the library data with real covers,
-                colors, ratings, and finished dates.
-              </p>
-            </div>
-          </section>
-        )}
-
-        {recommendations.length > 0 && (
-          <section className="recommendation-section" aria-label="Recommended to me">
-            <div className="recommendation-heading">
-              <p className="mono-label">Recommended to me</p>
-              <span>{recommendations.length} shelved</span>
-            </div>
-            <Shelf books={recommendations} justAdded={justAdded} genres={recommendationGenres} />
-          </section>
-        )}
+        <Shelf books={sections} selectedId={selectedId} onSelect={selectSection} />
       </section>
-
-      <RecommendBookDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onRecommend={addRecommendation} />
     </main>
   );
 }

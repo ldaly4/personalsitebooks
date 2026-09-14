@@ -3,21 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { COVER_W, faceFont } from "@/components/bookFaces";
-import type { Book } from "@/data/books";
+import type { SiteSection } from "@/data/sections";
 
 type BookSpineProps = {
-  book: Book;
+  book: SiteSection;
   onOpen: (rect: DOMRect) => void;
   active?: boolean;
-  shelveIn?: boolean;
 };
 
-function ratingLabel(rating: number) {
-  if (!rating) return "Unrated";
-  return `${rating}/5`;
-}
-
-export function BookSpine({ book, onOpen, active = false, shelveIn = false }: BookSpineProps) {
+export function BookSpine({ book, onOpen, active = false }: BookSpineProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [hovered, setHovered] = useState(false);
   const [card, setCard] = useState<{ left: number; top: number } | null>(null);
@@ -66,9 +60,10 @@ export function BookSpine({ book, onOpen, active = false, shelveIn = false }: Bo
     <>
       <button
         ref={buttonRef}
-        className={shelveIn ? "book-hit animate-shelve-in" : "book-hit"}
+        className="book-hit"
         style={style}
         type="button"
+        aria-label={`Open ${book.title}`}
         onClick={openBook}
         onFocus={showCard}
         onBlur={hideCard}
@@ -77,12 +72,11 @@ export function BookSpine({ book, onOpen, active = false, shelveIn = false }: Bo
       >
         <span className={`book-object ${book.finish} ${book.binding}`}>
           <span className="book-face">
-            {book.spineImage && <span className="spine-image" style={{ backgroundImage: `url(${book.spineImage})` }} />}
             <span className="spine-base" />
             <span className="spine-rule top" />
             <span className="spine-rule bottom" />
             <span className={`spine-title ${faceFont[book.face]} ${book.caps ? "caps" : ""}`}>{book.title}</span>
-            {book.width >= 44 && <span className="spine-author">{book.author}</span>}
+            {book.width >= 44 && <span className="spine-author">{book.coverNote}</span>}
             {book.width >= 30 && <span className="publisher-mark">{book.publisher.slice(0, 3) || "LIB"}</span>}
             <span className="spine-texture" />
             <span className="spine-sheen" />
@@ -90,15 +84,12 @@ export function BookSpine({ book, onOpen, active = false, shelveIn = false }: Bo
             <span className="spine-highlight" />
           </span>
           <span className="front-cover" style={{ width: COVER_W }}>
-            {book.cover ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={book.cover} alt="" />
-            ) : (
-              <span className="fallback-cover">
-                <strong>{book.title}</strong>
-                <small>{book.author}</small>
-              </span>
-            )}
+            <span className="typeset-cover">
+              <span className="cover-rule" />
+              <strong>{book.title}</strong>
+              <small>{book.coverNote}</small>
+              <span className="cover-foil">{book.publisher}</span>
+            </span>
           </span>
           <span className="page-block" />
           {book.binding === "hardcover" && <span className="headband" />}
@@ -110,19 +101,11 @@ export function BookSpine({ book, onOpen, active = false, shelveIn = false }: Bo
         createPortal(
           <aside className="hover-card" style={{ left: card.left, top: card.top }} onMouseEnter={showCard} onMouseLeave={hideCard}>
             <h3>{book.title}</h3>
-            <p>{book.author}</p>
+            <p>{book.description}</p>
             <div className="hover-meta">
-              <span>{book.year || "Unknown"}</span>
+              <span>{book.coverNote}</span>
               <span>{book.binding}</span>
-              <span>{ratingLabel(book.rating)}</span>
             </div>
-            {book.genres?.length ? (
-              <div className="hover-genres">
-                {book.genres.map((genre) => (
-                  <span key={genre}>{genre}</span>
-                ))}
-              </div>
-            ) : null}
           </aside>,
           document.body,
         )}
