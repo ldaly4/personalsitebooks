@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucy Daly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  min-height: 100%;
+  background-color: #f4efe8;
+  background-image: url('images/wallpaper.png');
+  background-repeat: repeat;
+  background-size: 300px;
+  font-family: 'Crimson Text', Georgia, serif;
+  color: #2a2a2a;
+}
+
+.page-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px;
+  gap: 48px;
+}
+
+.bookshelf-scene {
+  width: 100%;
+  max-width: 612px;
+}
+
+.scene {
+  position: relative;
+}
+
+.books-layer {
+  position: relative;
+  width: 100%;
+  z-index: 2;
+}
+
+.books-layer img {
+  width: 100%;
+  display: block;
+}
+
+.shelf-layer {
+  position: relative;
+  width: 100%;
+  margin-top: -10%;
+  z-index: 1;
+}
+
+.shelf-layer img {
+  width: 100%;
+  display: block;
+}
+
+.bunnies-layer {
+  position: absolute;
+  bottom: 18%;
+  right: 10%;
+  width: 18%;
+  z-index: 3;
+}
+
+.bunnies-layer img {
+  width: 100%;
+  display: block;
+}
+
+area {
+  cursor: pointer;
+}
+
+/* ===== RIGHT: BIO ===== */
+.bio {
+  max-width: 400px;
+}
+
+.logo {
+  width: 340px;
+  margin-bottom: 28px;
+  display: block;
+}
+
+.bio p {
+  font-size: 21px;
+  line-height: 1.55;
+  color: #2a2a2a;
+  margin-bottom: 2px;
+}
+
+.bio .craicathon-line {
+  margin-top: 10px;
+}
+
+.bio sup {
+  font-size: 13px;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 1000px) {
+  .page-wrap {
+    flex-direction: column;
+    gap: 36px;
+    padding: 30px 20px;
+  }
+  .bookshelf-scene {
+    width: 100%;
+    max-width: 520px;
+  }
+  .bio { text-align: center; }
+  .logo { margin-left: auto; margin-right: auto; }
+}
+
+@media (max-width: 540px) {
+  .page-wrap { padding: 20px 12px; }
+  .logo { width: 250px; }
+  .bio p { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- LEFT: BOOKSHELF SCENE -->
+  <div class="bookshelf-scene">
+    <div class="scene">
+
+      <!-- Books (top layer, in flow) -->
+      <div class="books-layer">
+        <img src="images/books.png" alt="Books on a shelf" usemap="#books-map">
+        <map name="books-map">
+          <area shape="rect" coords="0,0,90,408" href="patch.html" title="Patch">
+          <area shape="rect" coords="90,0,168,408" href="plots-and-schemes.html" title="Plots and Schemes">
+          <area shape="rect" coords="168,0,213,408" href="vapebox.html" title="Vapebox">
+          <area shape="rect" coords="213,0,328,408" href="water-stuff.html" title="Water Stuff">
+          <area shape="rect" coords="328,0,393,408" href="arts-and-crafts.html" title="Arts and Crafts">
+          <area shape="rect" coords="393,0,454,408" href="the-sensible-bits.html" title="The Sensible Bits">
+          <area shape="rect" coords="454,0,518,408" href="writing-and-talking.html" title="Writing & Talking">
+          <area shape="rect" coords="518,0,612,408" href="contact.html" title="Contact">
+        </map>
+      </div>
+
+      <!-- Shelf (behind books, pulled up) -->
+      <div class="shelf-layer">
+        <img src="images/shelf.png" alt="Wooden shelf">
+      </div>
+
+      <!-- Bunnies (on the shelf surface) -->
+      <div class="bunnies-layer">
+        <img src="images/bunnies.png" alt="Ceramic bunnies">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: BIO -->
+  <div class="bio">
+    <img class="logo" src="images/lucy-daly-logo.png" alt="Lucy Daly">
+    <p>Engineer from Dublin</p>
+    <p>Running Patch</p>
+    <p class="craicathon-line">Organising Craicathon - an Irish<br>language and culture hackathon on<br>28<sup>th</sup> March</p>
+  </div>
+
+</div>
+
+</body>
+</html>

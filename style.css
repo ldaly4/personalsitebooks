@@ -1,0 +1,102 @@
+/* Shared styles for all pages */
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { height: 100%; }
+body {
+  min-height: 100%;
+  background: url('images/wallpaper.png') repeat;
+  background-size: 300px;
+  font-family: 'Crimson Text', Georgia, serif;
+  color: #2a2a2a;
+}
+
+/* --- SUB-PAGE LAYOUT --- */
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 60px 32px 80px;
+}
+
+.back-link {
+  display: inline-block;
+  font-size: 16px;
+  color: #6b5b4f;
+  text-decoration: none;
+  margin-bottom: 40px;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #3a2e26;
+}
+
+.page-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: #2a2018;
+  margin-bottom: 32px;
+  line-height: 1.2;
+}
+
+.page-content p {
+  font-size: 19px;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  color: #3a3a3a;
+}
+
+.page-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 24px 0;
+  display: block;
+}
+
+.page-content a {
+  color: #6b5b4f;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.page-content a:hover {
+  color: #3a2e26;
+}
+
+.page-divider {
+  border: none;
+  border-top: 1px solid #c8b8a8;
+  margin: 40px 0;
+}
+
+/* Contact page specifics */
+.contact-info {
+  font-size: 20px;
+  line-height: 2;
+}
+
+.contact-info a {
+  color: #6b5b4f;
+  text-decoration: none;
+  border-bottom: 1px solid #c8b8a8;
+  transition: border-color 0.2s;
+}
+
+.contact-info a:hover {
+  border-color: #3a2e26;
+  color: #3a2e26;
+}
+
+/* --- MOBILE --- */
+@media (max-width: 540px) {
+  .page {
+    padding: 40px 20px 60px;
+  }
+  .page-title {
+    font-size: 36px;
+  }
+  .page-content p {
+    font-size: 17px;
+  }
+}

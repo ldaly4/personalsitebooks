@@ -1,0 +1,10 @@
+.next/
+node_modules/
+tsconfig.tsbuildinfo
+.env*
+!.env.example
+dist/
+out/
+coverage/
+.DS_Store
+homepath-v2/
